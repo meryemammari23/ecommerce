@@ -24,6 +24,9 @@
             <div class="col-lg-8">
                 <div class="card mb-3">
                     <div class="card-body">
+                        {% if items is empty %}
+                            <p class="text-muted text-center py-4">Votre panier est vide.</p>
+                        {% else %}
                         <table class="table align-middle">
                             <thead>
                                 <tr>
@@ -35,50 +38,48 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for item in items %}
                                 <tr>
-                                    <td>Wireless Headphones</td>
-                                    <td>$79.99</td>
-                                    <td>2</td>
-                                    <td class="fw-bold">$159.98</td>
-                                    <td><button class="btn btn-sm btn-outline-danger">Remove</button></td>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>${{ item.product.price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="fw-bold">${{ (item.product.price * item.quantity)|number_format(2) }}</td>
+                                    <td>
+                                        <a href="{{ path('app_cart_remove', {'id': item.product.id}) }}" class="btn btn-sm btn-outline-danger">Remove</a>
+                                    </td>
                                 </tr>
-                                <tr>
-                                    <td>Classic Leather Jacket</td>
-                                    <td>$149.99</td>
-                                    <td>1</td>
-                                    <td class="fw-bold">$149.99</td>
-                                    <td><button class="btn btn-sm btn-outline-danger">Remove</button></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
+                        {% endif %}
                     </div>
                 </div>
                 <a href="{{ path('app_product') }}" class="btn btn-outline-primary">Continue Shopping</a>
             </div>
+
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Order Summary</h5>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal:</span><span>$309.97</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Shipping:</span><span>$10.00</span>
-                        </div>
-                        <hr>
+                        {% set total = 0 %}
+                        {% for item in items %}
+                            {% set total = total + (item.product.price * item.quantity) %}
+                        {% endfor %}
                         <div class="d-flex justify-content-between mb-3">
                             <strong>Total:</strong>
-                            <strong class="text-success">$319.97</strong>
+                            <strong class="text-success">${{ total|number_format(2) }}</strong>
                         </div>
+
                         {% if app.user %}
-                            <div class="alert alert-success">Panier enregistré</div>
+                            <div class="alert alert-success">Panier enregistré ✅</div>
                         {% else %}
                             <div class="alert alert-warning">
                                 <a href="{{ path('app_security') }}">Connectez-vous</a> pour sauvegarder votre panier.
                             </div>
                         {% endif %}
+
                         <div class="d-grid">
                             <button class="btn btn-success btn-lg">Proceed to Checkout</button>
                         </div>
